@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مادة مقدمة الحاسوب | Supr Nova</title>
+  <meta name="description" content="ملخصات وموارد مادة مقدمة الحاسوب لطلاب الجامعة من Supr Nova." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="./assets/Fav%20Icon.jpeg" type="image/x-icon" />
+</head>
+<body>
+  <div class="hall"></div>
+  
+  <main class="container">
+    <article class="subject-page" data-subject="intro_cs">
+      <section class="title-wrap">
+        <h1>💻 Intro to Computer Science</h1>
+        <button class="page-btn back-btn" type="button" onclick="goBack('semester1.html')">⬅ Back</button>
+      </section>
+
+      <div style="margin: 2rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="color: rgba(255,255,255,.8);">Progress</span>
+          <span id="progress_intro_cs" style="color: rgba(255,255,255,.6); min-width: 40px;">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,.1); border-radius: 10px; overflow: hidden;">
+          <div id="progress_intro_cs_bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #58d5ff, #96f2f2); transition: width .3s ease;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap;">
+        <a href="https://www.youtube.com/watch?v=Brl0OTbRSCg&list=PLIbRmiNBsHd3PVwhoS88dgfsjn0uuiP8Z" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">🎥 Watch Videos</a>
+        <a href="https://drive.google.com/drive/folders/1oLJCmToXkUhqEFi2jR3wuR5kzStcXNxZ" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">📁 Open Files</a>
+      </div>
+
+      <button class="page-btn" id="favBtn" style="width: 100%; margin-bottom: 1rem;">☆ Add to Favorites</button>
+
+      <div style="margin: 2rem 0;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem; color: rgba(255,255,255,.9);">📝 Your Notes</h3>
+        <textarea class="notes-textarea" id="notesTextarea" placeholder="Write your notes here..." style="width: 100%; min-height: 120px; padding: 0.8rem; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; font-family: inherit; font-size: 0.9rem; resize: vertical; outline: none;"></textarea>
+      </div>
+    </article>
+  </main>
+
+  <script src="theme.js"></script>
+  <script src="script.js"></script>
+  <script>
+    const subjectId = "intro_cs";
+    const storageProgressKey = `progress_${subjectId}`;
+    const storageNotesKey = `notes_${subjectId}`;
+    const storageFavKey = `fav_${subjectId}`;
+    const lastSubjectKey = "lastSubject";
+    const progressBar = document.getElementById("progress_intro_cs_bar");
+    const progressText = document.getElementById("progress_intro_cs");
+    const notesTextarea = document.getElementById("notesTextarea");
+    const favBtn = document.getElementById("favBtn");
+
+    function getStoredProgress() {
+      const raw = localStorage.getItem(storageProgressKey);
+      const parsed = parseInt(raw || "0", 10);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function updateProgress() {
+      const progress = getStoredProgress();
+      progressBar.style.width = `${progress}%`;
+      progressText.textContent = `${progress}%`;
+    }
+
+    function loadNotes() {
+      notesTextarea.value = localStorage.getItem(storageNotesKey) || "";
+    }
+
+    function updateFavButton() {
+      const isFav = localStorage.getItem(storageFavKey) === "1";
+      favBtn.textContent = isFav ? "⭐ Remove from Favorites" : "☆ Add to Favorites";
+    }
+
+    function saveLastSubject() {
+      localStorage.setItem(lastSubjectKey, subjectId);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateProgress();
+      loadNotes();
+      updateFavButton();
+      saveLastSubject();
+
+      notesTextarea.addEventListener("input", () => {
+        localStorage.setItem(storageNotesKey, notesTextarea.value || "");
+      });
+
+      favBtn.addEventListener("click", () => {
+        const newFav = localStorage.getItem(storageFavKey) === "1" ? "0" : "1";
+        localStorage.setItem(storageFavKey, newFav);
+        updateFavButton();
+      });
+
+      document.querySelectorAll("a[target='_blank']").forEach(link => {
+        link.addEventListener("click", () => {
+          let currentProgress = getStoredProgress();
+          currentProgress = Math.min(100, currentProgress + 10);
+          localStorage.setItem(storageProgressKey, currentProgress);
+          updateProgress();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

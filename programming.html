@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مادة البرمجة | Supr Nova</title>
+  <meta name="description" content="ملخصات وموارد مادة البرمجة لطلاب الجامعة من Supr Nova." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="./assets/Fav%20Icon.jpeg" type="image/x-icon" />
+</head>
+<body>
+  <div class="hall"></div>
+  
+  <main class="container">
+    <article class="subject-page" data-subject="programming">
+      <section class="title-wrap">
+        <h1>💾 Programming</h1>
+        <button class="page-btn back-btn" type="button" onclick="goBack('semester2.html')">⬅ Back</button>
+      </section>
+
+      <div style="margin: 2rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="color: rgba(255,255,255,.8);">Progress</span>
+          <span id="progress_programming" style="color: rgba(255,255,255,.6); min-width: 40px;">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,.1); border-radius: 10px; overflow: hidden;">
+          <div id="progress_programming_bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #58d5ff, #96f2f2); transition: width .3s ease;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; flex-direction: column;">
+        <a href="https://youtube.com/playlist?list=PLi9sEkJW8DsO3BtJSp9OfWcFZVAHqOZ-J&si=QXi3dvNVgy2WTlRo" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">🎥 Main Playlist</a>
+        <a href="https://youtube.com/playlist?list=PLi9sEkJW8DsNnFkm9av18T_ynpsOXrp7L&si=6g07ao4v37yf_OL8" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">🎥 Assignment C++</a>
+        <a href="https://youtube.com/playlist?list=PLi9sEkJW8DsOYm3wEWArLhMoyB1hI2R8v&si=q8QksFU91X2pE3N0" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">🎥 Fundamental C++</a>
+        <a href="https://drive.google.com/drive/folders/1z60fqjP2YykcPvsDpTynLkEfjjSqzr3z" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">📁 Open Files</a>
+      </div>
+
+      <button class="page-btn" id="favBtn" style="width: 100%; margin-bottom: 1rem;">☆ Add to Favorites</button>
+
+      <div style="margin: 2rem 0;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem; color: rgba(255,255,255,.9);">📝 Your Notes</h3>
+        <textarea class="notes-textarea" id="notesTextarea" placeholder="Write your notes here..." style="width: 100%; min-height: 120px; padding: 0.8rem; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; font-family: inherit; font-size: 0.9rem; resize: vertical; outline: none;"></textarea>
+      </div>
+    </article>
+  </main>
+
+  <script src="theme.js"></script>
+  <script src="script.js"></script>
+  <script>
+    const subjectId = "programming";
+    const storageProgressKey = `progress_${subjectId}`;
+    const storageNotesKey = `notes_${subjectId}`;
+    const storageFavKey = `fav_${subjectId}`;
+    const lastSubjectKey = "lastSubject";
+    const progressBar = document.getElementById("progress_programming_bar");
+    const progressText = document.getElementById("progress_programming");
+    const notesTextarea = document.getElementById("notesTextarea");
+    const favBtn = document.getElementById("favBtn");
+
+    function getStoredProgress() {
+      const raw = localStorage.getItem(storageProgressKey);
+      const parsed = parseInt(raw || "0", 10);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function updateProgress() {
+      const progress = getStoredProgress();
+      progressBar.style.width = `${progress}%`;
+      progressText.textContent = `${progress}%`;
+    }
+
+    function loadNotes() {
+      notesTextarea.value = localStorage.getItem(storageNotesKey) || "";
+    }
+
+    function updateFavButton() {
+      const isFav = localStorage.getItem(storageFavKey) === "1";
+      favBtn.textContent = isFav ? "⭐ Remove from Favorites" : "☆ Add to Favorites";
+    }
+
+    function saveLastSubject() {
+      localStorage.setItem(lastSubjectKey, subjectId);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateProgress();
+      loadNotes();
+      updateFavButton();
+      saveLastSubject();
+
+      notesTextarea.addEventListener("input", () => {
+        localStorage.setItem(storageNotesKey, notesTextarea.value || "");
+      });
+
+      favBtn.addEventListener("click", () => {
+        const newFav = localStorage.getItem(storageFavKey) === "1" ? "0" : "1";
+        localStorage.setItem(storageFavKey, newFav);
+        updateFavButton();
+      });
+
+      document.querySelectorAll("a[target='_blank']").forEach(link => {
+        link.addEventListener("click", () => {
+          const current = getStoredProgress();
+          let newProgress = current + 10;
+          if (newProgress > 100) newProgress = 100;
+          localStorage.setItem(storageProgressKey, newProgress);
+          updateProgress();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

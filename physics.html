@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مادة الفيزياء | Supr Nova</title>
+  <meta name="description" content="ملخصات، محاضرات، وملفات مادة الفيزياء لطلاب الجامعة من Supr Nova." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="./assets/Fav%20Icon.jpeg" type="image/x-icon" />
+</head>
+<body>
+  <div class="hall"></div>
+  
+  <main class="container">
+    <article class="subject-page" data-subject="physics">
+      <section class="title-wrap">
+        <h1>⚡ Physics</h1>
+        <button class="page-btn back-btn" type="button" onclick="goBack('semester1.html')">⬅ Back</button>
+      </section>
+
+      <!-- Progress Bar -->
+      <div style="margin: 2rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="color: rgba(255,255,255,.8);">Progress</span>
+          <span id="progress_physics" style="color: rgba(255,255,255,.6); min-width: 40px;">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,.1); border-radius: 10px; overflow: hidden;">
+          <div id="progress_physics_bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #58d5ff, #96f2f2); transition: width .3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Content Buttons -->
+      <div style="display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap;">
+        <a href="https://www.youtube.com/watch?v=U55M5w1ETbs&list=PLIbRmiNBsHd3rcrp4oHgMur27zl3jUPCa" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">🎥 Watch Videos</a>
+        <a href="https://drive.google.com/drive/folders/1qnPWYD6vP-NLnLlRSrL4fu-fbJxsTAp4?usp=drive_link" target="_blank" rel="noopener noreferrer" class="page-btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; border: none; border-radius: 12px; padding: .85rem 1.4rem;">📁 Open Files</a>
+      </div>
+
+      <!-- Favorite Button -->
+      <button class="page-btn" id="favBtn" style="width: 100%; margin-bottom: 1rem;">☆ Add to Favorites</button>
+
+      <!-- Notes Section -->
+      <div style="margin: 2rem 0;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem; color: rgba(255,255,255,.9);">📝 Your Notes</h3>
+        <textarea class="notes-textarea" id="notesTextarea" placeholder="Write your notes here..." style="width: 100%; min-height: 120px; padding: 0.8rem; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; font-family: inherit; font-size: 0.9rem; resize: vertical; outline: none;"></textarea>
+      </div>
+    </article>
+  </main>
+
+  <script src="theme.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Initialize physics page
+    const subjectId = "physics";
+    const progressBar = document.getElementById("progress_physics_bar");
+    
+    function updatePhysicsProgress() {
+      const progress = parseInt(localStorage.getItem(`progress_${subjectId}`) || "0");
+      progressBar.style.width = progress + "%";
+      document.getElementById("progress_physics").textContent = progress + "%";
+    }
+    
+    document.addEventListener("DOMContentLoaded", updatePhysicsProgress);
+    
+    // Update progress when videos or files are opened
+    document.querySelectorAll("a[target='_blank']").forEach(link => {
+      link.addEventListener("click", () => {
+        let newProgress = parseInt(localStorage.getItem(`progress_${subjectId}`) || "0") + 10;
+        if (newProgress > 100) newProgress = 100;
+        localStorage.setItem(`progress_${subjectId}`, newProgress);
+        updatePhysicsProgress();
+      });
+    });
+  </script>
+</body>
+</html>
