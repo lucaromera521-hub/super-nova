@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://super-nova-seven.vercel.app/sitemap.xml
