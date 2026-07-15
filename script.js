@@ -17,42 +17,109 @@ const allSubjects = [
 ];
 
 // ============ SMART SEARCH ============
+function normalizeSearchText(text) {
+  return text
+    .toLocaleLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
 function setupSearch() {
   const searchInput = document.getElementById("searchInput");
   const searchDropdown = document.getElementById("searchDropdown");
-  
+  const cards = Array.from(document.querySelectorAll('#cards .card'));
+
   if (!searchInput) return;
-  
-  searchInput.addEventListener("input", (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    
+
+  const updateDropdown = (query) => {
+    if (!searchDropdown) return;
+
     if (!query) {
       searchDropdown.innerHTML = "";
       searchDropdown.style.display = "none";
+      searchInput.setAttribute('aria-expanded', 'false');
       return;
     }
-    
-    const results = allSubjects
-      .filter(s => s.name.toLowerCase().includes(query))
-      .slice(0, 5);
-    
-    if (results.length === 0) {
-      searchDropdown.innerHTML = "<div class='search-item'>No results found</div>";
-      searchDropdown.style.display = "block";
-      return;
+
+    const matches = allSubjects.filter(subject => {
+      const normalized = normalizeSearchText(subject.name);
+      return normalized.includes(query);
+    });
+
+    searchDropdown.innerHTML = '';
+    if (matches.length === 0) {
+      const noResults = document.createElement('div');
+      noResults.className = 'search-item';
+      noResults.textContent = 'No results found';
+      noResults.style.cursor = 'default';
+      noResults.style.borderColor = 'transparent';
+      noResults.style.background = 'rgba(255,255,255,.04)';
+      searchDropdown.appendChild(noResults);
+    } else {
+      matches.slice(0, 10).forEach(subject => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'search-item';
+        item.textContent = subject.name;
+        item.addEventListener('click', () => {
+          window.location.href = subject.page;
+        });
+        searchDropdown.appendChild(item);
+      });
     }
-    
-    searchDropdown.innerHTML = results
-      .map(s => `<div class="search-item" onclick="window.location.href='${s.page}'">${s.name}</div>`)
-      .join("");
-    searchDropdown.style.display = "block";
-  });
-  
-  document.addEventListener("click", (e) => {
-    if (e.target !== searchInput) {
-      searchDropdown.style.display = "none";
+
+    searchDropdown.style.display = 'block';
+    searchInput.setAttribute('aria-expanded', 'true');
+  };
+
+  const updateCards = (query) => {
+    if (!cards.length) return;
+
+    let visibleCount = 0;
+    cards.forEach(card => {
+      const title = card.querySelector('.subject-title')?.textContent || '';
+      const desc = card.querySelector('.subject-desc')?.textContent || '';
+      const normalizedTitle = normalizeSearchText(title);
+      const normalizedDesc = normalizeSearchText(desc);
+
+      if (!query || normalizedTitle.includes(query) || normalizedDesc.includes(query)) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    if (visibleCount === 0 && query) {
+      showNotification('🔍 No subjects found');
+    }
+  };
+
+  const onSearchChange = (e) => {
+    const query = normalizeSearchText(e.target.value);
+    updateCards(query);
+    updateDropdown(query);
+  };
+
+  searchInput.addEventListener('input', onSearchChange);
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchDropdown.style.display = 'none';
+      searchInput.setAttribute('aria-expanded', 'false');
+      searchInput.blur();
     }
   });
+
+  if (searchDropdown) {
+    document.addEventListener('click', (e) => {
+      if (e.target !== searchInput && e.target.closest('#searchDropdown') === null) {
+        searchDropdown.style.display = 'none';
+        searchInput.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
 }
 
 // ============ LEARNING FEATURES ============
@@ -456,29 +523,6 @@ function goBack(fallback) {
   }
 }
 
-// ============ SEARCH SYSTEM ============
-function updateSearchFilter(query) {
-  const cards = document.querySelectorAll('#cards .card');
-  const lowerQuery = query.toLowerCase();
-  let visibleCount = 0;
-  
-  cards.forEach(card => {
-    const title = card.querySelector('.subject-title')?.textContent.toLowerCase() || '';
-    const desc = card.querySelector('.subject-desc')?.textContent.toLowerCase() || '';
-    
-    if (title.includes(lowerQuery) || desc.includes(lowerQuery) || lowerQuery === '') {
-      card.classList.remove('hidden');
-      visibleCount++;
-    } else {
-      card.classList.add('hidden');
-    }
-  });
-  
-  if (visibleCount === 0 && query !== '') {
-    showNotification('🔍 No subjects found');
-  }
-}
-
 document.addEventListener('DOMContentLoaded', ()=> {
   const hoverTone = (()=> {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -569,12 +613,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
   }
 
   // Setup search
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      updateSearchFilter(e.target.value);
-    });
-  }
+  setupSearch();
 });
 
 function createParticleCanvas() {
